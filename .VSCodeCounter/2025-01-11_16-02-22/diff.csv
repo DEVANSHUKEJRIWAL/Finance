@@ -1,0 +1,8 @@
+"filename", "language", "TypeScript", "CSS", "TypeScript JSX", "comment", "blank", "total"
+"/Users/devanshukejriwal/Downloads/project/src/App.tsx", "TypeScript JSX", 0, 0, 146, 12, 12, 170
+"/Users/devanshukejriwal/Downloads/project/src/index.css", "CSS", 0, 3, 0, 0, 1, 4
+"/Users/devanshukejriwal/Downloads/project/src/main.tsx", "TypeScript JSX", 0, 0, 9, 0, 2, 11
+"/Users/devanshukejriwal/Downloads/project/src/types/data.ts", "TypeScript", 24, 0, 0, 0, 2, 26
+"/Users/devanshukejriwal/Downloads/project/src/utils/csvLoader.ts", "TypeScript", 19, 0, 0, 0, 1, 20
+"/Users/devanshukejriwal/Downloads/project/src/vite-env.d.ts", "TypeScript", 0, 0, 0, 1, 1, 2
+"Total", "-", 43, 3, 155, 13, 19, 233
