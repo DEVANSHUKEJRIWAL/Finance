@@ -1,11 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, LineChart, TrendingUp } from 'lucide-react';
-import { DashboardCard } from './components/DashboardCard';
-import { StockMetrics } from './components/StockMetrics';
-import { HeatMap } from './components/HeatMap';
-import { StockComparison } from './components/StockComparison';
-import { DateRangePicker } from './components/DateRangePicker';
-import { LoginForm } from './components/LoginForm';
+
 import { loadCSVData } from './utils/csvLoader';
 import type { Stock, TimeSeriesData } from './types/data';
 

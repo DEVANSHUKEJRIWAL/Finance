@@ -16,7 +16,7 @@ CORS(app)
 # Connect to MongoDB
 client = MongoClient('mongodb+srv://srivastavanandinee:hz0IL73wGrLHi6iT@cluster0.k5cq4.mongodb.net/')  # Replace with your MongoDB URI
 db = client['FinancialDashboard']  # Replace with your database name
-collection = db['prices']  # Replace with your collection name
+collection = db['fundamentals']  # Replace with your collection name
 
 # Load data from MongoDB
 def load_data():
@@ -38,60 +38,46 @@ def get_returns_volatility():
 # Route 2: Dummy Portfolio Bar Chart
 @app.route('/dummy-portfolio', methods=['GET'])
 def dummy_portfolio():
-    data = load_data()
+    data = load_data()  # Assuming `load_data` reads and returns your dataset
     print(data)
     top_10_companies = data.groupby('Ticker Symbol')['Net Income'].sum().nlargest(10).index
     dummy_portfolio = data[data['Ticker Symbol'].isin(top_10_companies)].groupby('Ticker Symbol')['Total Revenue'].sum()
+    dummy_portfolio_data = dummy_portfolio.to_dict()
+    return jsonify({'dummy_portfolio': dummy_portfolio_data})
     
-    # Plot the bar chart
-    plt.figure(figsize=(10, 6))
-    dummy_portfolio.plot(kind='bar', title='Dummy Portfolio Performance')
-    plt.xlabel('Ticker Symbol')
-    plt.ylabel('Total Revenue')
-    
-    # Convert plot to image
-    img = io.BytesIO()
-    plt.savefig(img, format='png')
-    img.seek(0)
-    plot_url = base64.b64encode(img.getvalue()).decode()
-    plt.close()
-    return jsonify({'plot_url': f"data:image/png;base64,{plot_url}"})
 
 # Route 3: Heatmap for Top 50 Most Traded Stocks
-@app.route('/heatmap', methods=['GET'])
-def heatmap():
-    data = load_data()
-    data['Investments'] = data['Total Revenue']  # Proxy for trading activity
-    top_50_stocks = data.nlargest(50, 'Trading Activity')
-    pivot_table = top_50_stocks.pivot_table(index='Ticker Symbol', columns='Period Ending', values='Trading Activity')
-    
-    # Plot heatmap
-    plt.figure(figsize=(12, 8))
-    sns.heatmap(pivot_table, cmap='coolwarm', annot=False)
-    plt.title('Heatmap for Top 50 Most Traded Stocks')
-    
-    # Convert plot to image
-    img = io.BytesIO()
-    plt.savefig(img, format='png')
-    img.seek(0)
-    plot_url = base64.b64encode(img.getvalue()).decode()
-    plt.close()
-    return jsonify({'plot_url': f"data:image/png;base64,{plot_url}"})
+# @app.route('/heatmap', methods=['GET'])
+# def heatmap():
+#     data = load_data()
+#     data['Investments'] = data['Total Revenue']  # Proxy for trading activity
+
+#     # Select the top 50 stocks by trading activity
+#     top_50_stocks = data.nlargest(50, 'Trading Activity')
+
+#     # Create a pivot table for the data
+#     pivot_table = top_50_stocks.pivot_table(index='Ticker Symbol', columns='Period Ending', values='Trading Activity')
+
+#     # Convert the pivot table to a dictionary format for JSON output
+#     heatmap_data = pivot_table.fillna(0).to_dict()  # Replace NaN with 0 for easier interpretation
+
+#     # Return the data as JSON
+#     return jsonify({'heatmap_data': heatmap_data})
 
 # Route 4: Profit Projection for Top 10 Companies
-# @app.route('/profit-projection', methods=['GET'])
-# def profit_projection():
-#     data = load_data()
-#     top_companies = data.groupby('Ticker Symbol')['Net Income'].sum().nlargest(10).index
-#     projections = {}
-#     for company in top_companies:
-#         company_data = data[data['Ticker Symbol'] == company]
-#         x = np.arange(len(company_data))
-#         y = company_data['Net Income']
-#         if len(x) > 1:  # Ensure there is enough data for regression
-#             coeffs = np.polyfit(x, y, deg=1)  # Linear regression
-#             projections[company] = coeffs[0] * (len(x) + 1) + coeffs[1]  # Next year's projection
-#     return jsonify(projections)
+@app.route('/profit-projection', methods=['GET'])
+def profit_projection():
+    data = load_data()
+    top_companies = data.groupby('Ticker Symbol')['Net Income'].sum().nlargest(10).index
+    projections = {}
+    for company in top_companies:
+        company_data = data[data['Ticker Symbol'] == company]
+        x = np.arange(len(company_data))
+        y = company_data['Net Income']
+        if len(x) > 1:  # Ensure there is enough data for regression
+            coeffs = np.polyfit(x, y, deg=1)  # Linear regression
+            projections[company] = coeffs[0] * (len(x) + 1) + coeffs[1]  # Next year's projection
+    return jsonify(projections)
 
 # Run the Flask app
 if __name__ == '__main__':
